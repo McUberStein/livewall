@@ -26,7 +26,7 @@ RED="\001\x1B[1;31m"
 ENDCOLOR="\x1B[0m\002"
 
 
-[ -z "$1" ] && printf "${RED}No file specified${ENDCOLOR}\n" && exit
+[ -z "$1" ] && printf "${RED}No file specified${ENDCOLOR}\n" && RETURN=1 exit
 
 
 if [ -z "$2" ]; then
