@@ -1,0 +1,46 @@
+#!/bin/bash
+
+inter_handler () {
+	printf "${RED}I have been slain...\n${ENDCOLOR}"
+	sleep 0.5 && killall mpv &> /dev/null
+	sleep 0.5 && killall xwinwrap &> /dev/null
+	RETURN=1
+	exit 1
+}
+
+init_handler () {
+	if [[ "$RETURN" != 1 ]]; then
+		printf "${LCYAN}Starting MPV...${ENDCOLOR}\n"
+	else
+		printf "${LCYAN}Exiting...${ENDCOLOR}\n"
+	fi
+}
+
+trap 'inter_handler' INT SIGKILL SIGTERM
+trap 'init_handler' EXIT 0 
+
+
+LCYAN="\001\x1B[0;36m"
+CYAN="\001\x1B[1;36m"
+RED="\001\x1B[1;31m"
+ENDCOLOR="\x1B[0m\002"
+
+
+[ -z "$1" ] && printf "${RED}No file specified${ENDCOLOR}\n" && exit
+
+
+if [ -z "$2" ]; then
+	printf "${CYAN} Screen resolution not specified. Attempting to set automatically\n${ENDCOLOR}"
+	RES="$(xdpyinfo | awk '/dimensions/ {print $2}')"
+else
+	RES="$2"
+fi
+
+
+
+killall xwinwrap &> /dev/null
+
+sleep 0.3
+
+xwinwrap -ov -g ${RES}+0+0 -- mpv -wid WID "$1" --no-osc --no-osd-bar --loop-file --player-operation-mode=cplayer --no-audio --panscan=1.0 --no-keepaspect --no-input-default-bindings --hwdec&
+
